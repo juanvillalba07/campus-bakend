@@ -4,20 +4,9 @@ const { Matter } = require('../../database/models/index');
 const sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-// const transporter = require('../../config/mailer');
 const nodemailer = require("nodemailer");
 
 const Mail = require('../../config/mailer');
-
-// const transporter = nodemailer.createTransport({
-//         host: "smtp.gmail.com",
-//         port: 465,
-//         secure: true,
-//         auth: {
-//           user: 'juanvillalbaa09@gmail.com',
-//           pass: 'gjkkevyzghmotslm'
-//         }
-//     });
 
 //API
 

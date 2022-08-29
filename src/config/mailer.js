@@ -4,8 +4,8 @@ const transporter = mailer.createTransport({
 	port: 465,
 	secure: true,
 	auth: {
-		user: 'juanvillalbaa09@gmail.com',
-		pass: 'gjkkevyzghmotslm'
+		user: process.env.MAIL_USER,
+		pass: process.env.MAIL_PASS
 	}
 });
 
@@ -17,7 +17,7 @@ const registerBody = '<b>su cuenta ha sido creada con exito<b>';
 
 function sendMail(recept, subject, body){
 	transporter.sendMail({
-		from: '"Administracion campus" <juanvillalbaa09@gmail.com>', // sender address
+		from: '"Administracion campus"', // sender address
 		to: recept, // list of receivers
 		subject: subject, // Subject line
 		html: body, // html body
