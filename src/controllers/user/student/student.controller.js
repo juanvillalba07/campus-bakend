@@ -60,6 +60,8 @@ const register = async (req,res) => {
 const login = async (req, res) => {
     const {dni, password} = req.body
 
+    console.log('Buscando el usuario y validando los datos ingresados......');
+
     User.findOne({
         where:{dni:dni},
         attributes: ['id', 'name', 'email', 'role', 'dni', 'password'],
@@ -68,8 +70,9 @@ const login = async (req, res) => {
     if (!user) {
         res.status(404).json({msg: 'dni invalido'}) 
     }else if(user.role === 'student' && bcrypt.compareSync(password, user.password)){
+        console.log('Creando token');
         console.log(user);
-        const token = jwt.sign({id:user.id, role: user.role}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "8h"})
+        const token = jwt.sign({id:user.id, role: user.role, mail: user.email}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "8h"})
 
         return res.status(200).json({
             user, 
@@ -91,21 +94,16 @@ const destroy = async (req,res) => {
     let user = await User.findOne({ 
         where: { id: id , role:role} 
     });
+    console.log('Buacando el usuario');
     if (!user) {
         return res.status(404).json({msg:"Usuario no encontrado"})
     } else {
+        console.log('Eliminando usuario....');
         user.destroy().then(user => {
         res.status(200).json({status:200,msg:"operation complete"})
         })
     }
 };
-
-// const logOut = async (req, res, next) => {
-// 	//Eliminar cookie jwt
-// 	res.clearCookie('jwt')
-// 	//Redirigir a la vista de login
-// 	return res.redirect('/login')
-// };
 
 module.exports = {
     identifyById,
@@ -113,5 +111,4 @@ module.exports = {
     register,
     login,
     destroy
-    // logOut,
 };

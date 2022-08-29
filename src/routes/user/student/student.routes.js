@@ -17,8 +17,6 @@ router.post("/", validateRegister, EmailIsUnique, DniIsUnique, student.register)
 
 router.post("/login", validateLogin, student.login);
 
-// router.get('/logout', logOut)
-
 router.delete("/:id" , imAdmin, student.destroy);
 
 module.exports = router;
