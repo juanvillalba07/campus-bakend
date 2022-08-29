@@ -1,6 +1,10 @@
+---------REQUISITOS-----------
+tener instalado mysql, NodeJS y sequelize
+para intalar sequelize npm install -g sequelize-cli (ejecutarlo con sudo en linux y en windows abriri una terminal en modo administrador)
+
 ----------LEVANTAR EL PROYECTO---------
 primero 
-	se debe crear la base de datos campus
+	se debe crear la base de datos con el nombre que se eligio en el archivo .env
 
 segundo
 	crear el archivo .env a corde a su configuracion de mysql
