@@ -8,3 +8,4 @@ api:
 
 clean: 
 	$(RM) -r node_modules
+	$(RM) -r package-lock.json
