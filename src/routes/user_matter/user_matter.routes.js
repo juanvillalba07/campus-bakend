@@ -2,8 +2,8 @@ const Router = require('express');
 const router = Router();
 
 const user_matter = require('../../controllers/user_matter/user_matter.controller');
-const {imAdmin} = require('../../validators/user/validationUser'); 
-const {NameIsUnique} = require('../../validators/matter/validationsMatter')
+const {imStudent} = require('../../validators/user/validationUser'); 
+const {NameIsUnique, MatterExist, AllReadySubscribe, ImSubscribe, VacancyAviable} = require('../../validators/matter/validationsMatter')
 
 //API
 
@@ -11,8 +11,8 @@ const {NameIsUnique} = require('../../validators/matter/validationsMatter')
 
 router.get("/", user_matter.getMatterInscript);
 
-// router.post("/", imAdmin, NameIsUnique, matter.register);
+router.post("/:id_matter", imStudent, MatterExist, AllReadySubscribe, VacancyAviable, user_matter.subscribeMatter);
 
-// router.delete("/:id" , imAdmin, matter.destroy);
+router.delete("/:id_matter" , imStudent, ImSubscribe, user_matter.cancelSubscription);
 
 module.exports = router;

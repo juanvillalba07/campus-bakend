@@ -38,6 +38,7 @@ const getMatterInscript = async (req, res) => {
         attributes: ['user_id', 'matter_id'],
         where: { user_id: id_user }
     })
+
     console.log('Obteniendo detalles del listado de las matrias');
     const matterList = await Promise.all(
         user_matter.rows.map(async (matter) => {
@@ -59,35 +60,56 @@ const getMatterInscript = async (req, res) => {
 };
 
 
-// const register = async (req,res) => {
-//     let params = req.body;
-//     let matter = await Matter.create(params)
-//     if (matter) {
-//         return res.status(200).json({'status':200, matter, 'msg':'Creado correctamente'})
-//     } else {
-//         return res.status(404).json({'msg':'No se recibieron los datos'})
-//     }
-// };
+const subscribeMatter = async (req,res) => {
+    const id_matter = req.params.id_matter;
+    const token = req.headers.authorization
+    const id_user = jwt.decode(token).id
+    
+    const matter = await Matter.findOne({
+        attributes: ['id', 'name', 'quota', 'registered'],
+        where:{id:id_matter}
+    });
+    if (matter){
+        matter.increment('registered')
+    }
+
+    let result = await User_matter.create({user_id: id_user, matter_id: Number(id_matter)})
+    if (result) {
+        return res.status(200).json({'status':200, result, 'msg':'Creado correctamente'})
+    } else {
+        return res.status(404).json({'msg':'No se recibieron los datos'})
+    }
+};
 
 
-// const destroy = async (req,res) => {
-//     const id = req.params.id;
-//     let matter = await Matter.findOne({ 
-//         where: { id: id } 
-//     });
-//     if (!matter) {
-//         return res.status(404).json({msg:"Materia no encontrada"})
-//     } else {
-//         matter.destroy().then(matter => {
-//         res.status(200).json({status:200,msg:"operation complete"})
-//         })
-//     }
-// };
+const cancelSubscription = async (req,res) => {
+    const id_matter = req.params.id_matter;
+    const token = req.headers.authorization
+    const id_user = jwt.decode(token).id
+
+    const matter = await Matter.findOne({
+        attributes: ['id', 'name', 'quota', 'registered'],
+        where:{id:id_matter}
+    });
+    if (matter){
+        matter.decrement('registered')
+    }
+
+    let result = await User_matter.findOne({ 
+        where: { user_id: id_user, matter_id:id_matter } 
+    });
+    if (!result) {
+        return res.status(404).json({msg:"Materia no encontrada"})
+    } else {
+        result.destroy().then(result => {
+        res.status(200).json({status:200,msg:"operation complete"})
+        })
+    }
+};
 
 
 module.exports = {
-    // identifyById,
-    getMatterInscript
-    // register,
-    // destroy
+    getMatterInscript,
+    subscribeMatter,
+    cancelSubscription
 };

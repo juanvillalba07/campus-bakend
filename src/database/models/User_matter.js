@@ -14,11 +14,18 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   User_matter.init({
-    user_id: DataTypes.INTEGER,
-    matter_id: DataTypes.INTEGER
+    user_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    matter_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    }
   }, {
     sequelize,
     modelName: 'User_matter',
   });
+  User_matter.removeAttribute('id');
   return User_matter;
 };
