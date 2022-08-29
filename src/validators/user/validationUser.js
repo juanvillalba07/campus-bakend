@@ -48,13 +48,11 @@ const DniIsUnique = async (req, res, next) => {
         where: { dni: dni }
     }).then(user => {
         if (user) {
-            //Email invalido
             return res.status(400).json({ msg: "El dni ingresado ya se encuentra en uso" })
         } else {
             next()
         }
     }).catch(err => {
-        //Fallo al buscar el email en la base de datos
         return res.status(500).json(err.message)
     })
 };
@@ -67,13 +65,11 @@ const EmailIsUnique = async (req, res, next) => {
         where: { email: email }
     }).then(user => {
         if (user) {
-            //Email invalido
             return res.status(400).json({ msg: "El email ingresado ya se encuentra en uso" })
         } else {
             next()
         }
     }).catch(err => {
-        //Fallo al buscar el email en la base de datos
         return res.status(500).json(err.message)
     })
 };

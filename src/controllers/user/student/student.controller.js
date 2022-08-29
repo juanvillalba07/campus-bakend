@@ -60,17 +60,14 @@ const register = async (req,res) => {
 const login = async (req, res) => {
     const {dni, password} = req.body
 
-    //Comprobar dni en DB
     User.findOne({
         where:{dni:dni},
         attributes: ['id', 'name', 'email', 'role', 'dni', 'password'],
     })
     .then(user =>{
     if (!user) {
-        //dni invalido
         res.status(404).json({msg: 'dni invalido'}) 
     }else if(user.role === 'student' && bcrypt.compareSync(password, user.password)){
-        //Seteo un Token
         console.log(user);
         const token = jwt.sign({id:user.id, role: user.role}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "8h"})
 
@@ -79,7 +76,6 @@ const login = async (req, res) => {
             token
         })
     }else{
-        //Acceso denegado - Usuario y/o contraseña invalidos
         return res.status(401).json({msg: 'Usuario y/o contraseña incorrecta'})
     }
     

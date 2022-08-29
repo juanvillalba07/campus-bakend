@@ -76,7 +76,7 @@ const ImSubscribe = async (req, res, next) => {
 };
 
 
-const VacancyAviable = async (req, res, next) => {
+const VacancyAvailable = async (req, res, next) => {
 	const id_matter = req.params.id_matter
 	
 	Matter.findOne({
@@ -103,5 +103,5 @@ module.exports = {
 	MatterExist,
 	AllReadySubscribe,
 	ImSubscribe,
-	VacancyAviable
+	VacancyAvailable
 } 
