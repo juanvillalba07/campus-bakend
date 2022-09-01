@@ -75,13 +75,30 @@ const EmailIsUnique = async (req, res, next) => {
 };
 
 
+const UserExist = async (req, res, next) => {
+    let id = req.params.id_user
+
+    User.findOne({
+        where: { id: id }
+    }).then(user => {
+        if (!user) {
+            return res.status(400).json({ msg: "No existe el usuario" })
+        } else {
+            next()
+        }
+    }).catch(err => {
+        return res.status(500).json(err.message)
+    })
+};
+
+
 const imAdmin = async (req, res, next) => {
     if (req.headers.authorization === undefined || req.headers.authorization === "") {
         res.status(401).json({ msg: "No autorizado" })
     } else {
         const token = req.headers.authorization;
         const role = jwt.decode(token).role;
-        if (role == 'student') {
+        if (role == 'admin') {
             req.isAdmin = true;
             next()
         } else {
@@ -106,15 +123,18 @@ const imStudent = async (req, res, next) => {
 };
 
 const imTeacher = async (req, res, next) => {
-    const token = req.headers.authorization;
-    if (token !== undefined && token !== "") {
+    if (req.headers.authorization === undefined || req.headers.authorization === "") {
+        res.status(401).json({ msg: "No autorizado" })
+    } else {
+        const token = req.headers.authorization;
         const role = jwt.decode(token).role;
-        if (role || role === 'teacher') {
+        if (role == 'teacher') {
             req.isAdmin = true;
             next()
+        } else {
+            res.status(401).json({ msg: "No autorizado" })
         }
     }
-    res.status(401).json({ msg: "No autorizado" })
 };
 
 module.exports = { 
@@ -122,6 +142,7 @@ module.exports = {
     validateRegister, 
     DniIsUnique, 
     EmailIsUnique, 
+    UserExist,
     imAdmin, 
     imStudent, 
     imTeacher 

@@ -9,11 +9,19 @@ const transporter = mailer.createTransport({
 	}
 });
 
-const subscribeBody = '<b>se ha registrado con exito a la materia<b>';
+const subscribeBody = '<b>Se ha registrado con exito a la materia<b>';
 
-const cancelBody = '<b> usted se ha dado de baja de la materia<b>'
+const cancelBody = '<b> Usted se ha dado de baja de la materia<b>'
 
-const registerBody = '<b>su cuenta ha sido creada con exito<b>';
+const registerBody = '<b>Su cuenta ha sido creada con exito<b>';
+
+const destoyUserBody = '<b>Su cuenta ha sido eliminada<b>';
+
+const assingBody = '<b>Usted ha sido asignado profesor de la mteria<b>';
+
+const unassingBody = '<b>Usted ha sido desasignado como profesor de la mteria<b>';
+
+
 
 function sendMail(recept, subject, body){
 	transporter.sendMail({
@@ -25,7 +33,7 @@ function sendMail(recept, subject, body){
 }
 
 function subscriptionMatter(recept){
-	sendMail(recept, 'subscripcion', subscribeBody);
+	sendMail(recept, 'Subscripcion', subscribeBody);
 }
 
 function registeUser(recept){
@@ -36,9 +44,26 @@ function cancelSubscrive(recept){
 	sendMail(recept,'Baja de materia',cancelBody);
 }
 
+function destoyUser(recept){
+	sendMail(recept,'Baja de materia',destoyUserBody);
+}
+
+
+function assingMatter(recept){
+	sendMail(recept,'Asignacion de materia',assingBody);
+}
+
+
+function unassingMatter(recept){
+	sendMail(recept,'Desasignacion de materia',unassingBody);
+}
+
+
 module.exports = {
-	sendMail, 
 	subscriptionMatter, 
 	registeUser, 
-	cancelSubscrive
+	cancelSubscrive,
+	destoyUser,
+	assingMatter,
+	unassingMatter
 }

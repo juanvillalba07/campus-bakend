@@ -3,39 +3,52 @@ const { User } = require('../../../database/models/index');
 const sequelize = require('sequelize');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { where } = require('sequelize');
+const Mail = require('../../../config/mailer');
 const role = 'admin'
 
 //API
 
 const identifyById = async (req,res) => {
+
     const id = req.params.id
-    let user = await User.findOne({ 
+
+    console.log('buscando administrador por el id: '+id);
+
+    const user = await User.findOne({ 
         attributes: ['id', 'name', 'email', 'role', 'dni'],
-        where: { id: id , role:role} 
+        where: { 
+            id: id,
+            role:role
+        } 
     });
-    if (user) {
+
+    console.log((user));
+
+    if (user) 
         return res.status(200).json({'status':200, user})
-    } else {
+    else
         return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
-    }
 };
 
 
 const search = async (req,res) => {
-    let pageAsNumber = Number.parseInt(req.query.page);
-    let page = 0, size = 10;
+
+    const pageAsNumber = Number.parseInt(req.query.page);
+    const page = 0, size = 10;
     
-    if (!Number.isNaN(pageAsNumber)) {
+    if (!Number.isNaN(pageAsNumber)) 
         page = pageAsNumber;
-    }
     
-    let users = await User.findAndCountAll({
+    console.log('obteniendo el listado de administradores......');
+
+    const users = await User.findAndCountAll({
         limit: size, 
         offset: page * size,
         attributes: ['id', 'name', 'email', 'role', 'dni'],
         where:{role:role}
-    })
+    });
+
+    console.log(users);
 
     return res.status(200).json({
         'status':200, 
@@ -47,11 +60,20 @@ const search = async (req,res) => {
 
 
 const register = async (req,res) => {
-    let params = req.body;
-    params.role = 'admin';
-    params.password = await bcrypt.hash(req.body.password, 10);
-    let user = await User.create(params)
+
+    const adminParam = req.body;
+    adminParam.password = await bcrypt.hash(req.body.password, 10);
+
+    console.log('creando admin.....');
+
+    const user = await User.create(adminParam)
+
+    console.log(user);
+
     if (user) {
+        user.role = role;
+        user.save();
+        Mail.registeUser(user.email);
         return res.status(200).json({'status':200, user, 'msg':'Creado correctamente'})
     } else {
         return res.status(404).json({'msg':'No se recibieron los datos'})
@@ -60,62 +82,60 @@ const register = async (req,res) => {
 
 
 const login = async (req, res) => {
+
     const {dni, password} = req.body
     console.log(dni, password);
 
-    //Comprobar dni en DB
     User.findOne({
         where:{
             dni:dni,
             role:role
         },
         attributes: ['id', 'name', 'email', 'role', 'dni', 'password'],
-    })
-    .then(user =>{
-    if (!user) {
-        //dni invalido
-        res.status(404).json({msg: 'dni invalido'}) 
-    }else if(user.role === role && bcrypt.compareSync(password, user.password)){
-        //Seteo un Token
-        console.log(user);
-        const token = jwt.sign({id:user.id, role: user.role}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "8h"})
+    }).then(user =>{
+        if (!user) {
+            res.status(404).json({msg: 'dni invalido'}) 
+        }else if(user.role === role && bcrypt.compareSync(password, user.password)){
 
-        return res.status(200).json({
-            user, 
-            token
-        })
-    }else{
-        //Acceso denegado - Usuario y/o contraseña invalidos
-        return res.status(401).json({msg: 'Usuario y/o contraseña incorrecta'})
-    }
-    
+            console.log(user);
+
+            const token = jwt.sign({id:user.id, role: user.role, email:user.email}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: "8h"})
+            
+            delete user.dataValues['password'];
+            
+            return res.status(200).json({
+                user, 
+                token
+            })
+        }else{
+            return res.status(401).json({msg: 'Usuario y/o contraseña incorrecta'})
+        }
     }).catch(err => {
-    //Fallo al buscar el dni en la base de datos
-    return res.status(500).json(err.message)
+        return res.status(500).json(err.message)
     })
 }
 
 
 const destroy = async (req,res) => {
+
     const id = req.params.id;
-    let user = await User.findOne({ 
+
+    console.log('buscando administrador por el id: '+id);
+
+    const user = await User.findOne({ 
         where: { id: id , role:role} 
     });
-    if (!user) {
+
+    if (!user)
         return res.status(404).json({msg:"Usuario no encontrado"})
-    } else {
+    else {
+        console.log('eliminando usuario.....');
         user.destroy().then(user => {
-        res.status(200).json({status:200,msg:"operation complete"})
-        })
+            Mail.destoyUser(user.email);
+            res.status(200).json({status:200,msg:"operation complete"})
+        });
     }
 };
-
-// const logOut = async (req, res, next) => {
-// 	//Eliminar cookie jwt
-// 	res.clearCookie('jwt')
-// 	//Redirigir a la vista de login
-// 	return res.redirect('/login')
-// };
 
 module.exports = {
     identifyById,
@@ -123,5 +143,4 @@ module.exports = {
     register,
     login,
     destroy
-    // logOut,
 };

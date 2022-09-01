@@ -10,7 +10,7 @@ router.get("/", imAdmin, admin.search);
 
 router.get("/:id", imAdmin, admin.identifyById);
 
-router.post("/", validateRegister, EmailIsUnique, DniIsUnique, admin.register);
+router.post("/", validateRegister, EmailIsUnique, DniIsUnique, imAdmin, admin.register);
 
 router.post("/login", validateLogin, admin.login);
 

@@ -7,11 +7,9 @@ const {imAdmin, EmailIsUnique, DniIsUnique, validateLogin, validateRegister, imS
 
 //API
 
-router.get("/", imAdmin, student.search);
+router.get("/", student.search);
 
 router.get("/:id", imAdmin, student.identifyById);
-
-router.get("/matter", imStudent, getMatterInscript);
 
 router.post("/", validateRegister, EmailIsUnique, DniIsUnique, student.register);
 

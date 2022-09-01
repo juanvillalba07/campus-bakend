@@ -4,6 +4,7 @@ const Matter = require('./Matters');
 module.exports = (sequelize, DataTypes) => {
 	class User extends Model {
 		static associate(models) {
+			User.belongsToMany(models.Matter,{through: 'User_matters', foreignKey: 'user_id'});
 		}
 	}
 	User.init({
