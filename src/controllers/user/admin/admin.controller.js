@@ -116,6 +116,134 @@ const login = async (req, res) => {
 }
 
 
+const setName = async (req,res) => {
+
+    const id = req.params.id_user
+    const name = req.body.name;
+
+    console.log('buscando usuario por el id: '+id);
+
+    const user = await User.findOne({ 
+        attributes: ['id', 'name'],
+        where: { 
+            id: id,
+            role:role
+        } 
+    });
+
+    console.log('usuario antes del update');
+    console.log((user));
+
+    user.name = name;
+
+    user.save();
+
+    console.log('usuario despues del update');
+    console.log(user);
+
+    if (user) 
+        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'})
+    else
+        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
+};
+
+
+const setEmail = async (req,res) => {
+
+    const id = req.params.id_user
+    const email = req.body.email;
+
+    console.log('buscando usuario por el id: '+id);
+
+    const user = await User.findOne({ 
+        attributes: ['id', 'email'],
+        where: { 
+            id: id,
+            role:role
+        } 
+    });
+
+    console.log('usuario antes del update');
+    console.log((user));
+
+    user.email = email;
+
+    user.save();
+
+    console.log('usuario despues del update');
+    console.log(user);
+
+    if (user) 
+        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'})
+    else
+        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
+};
+
+
+const setDni = async (req,res) => {
+
+    const id = req.params.id_user
+    const dni = req.body.dni;
+
+    console.log('buscando usuario por el id: '+id);
+
+    const user = await User.findOne({ 
+        attributes: ['id', 'dni'],
+        where: { 
+            id: id,
+            role:role
+        } 
+    });
+
+    console.log('usuario antes del update');
+    console.log((user));
+
+    user.dni = dni;
+
+    user.save();
+
+    console.log('usuario despues del update');
+    console.log(user);
+
+    if (user) 
+        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'})
+    else
+        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
+};
+
+
+const setRole = async (req,res) => {
+
+    const id = req.params.id_user
+    const role = req.body.role;
+
+    console.log('buscando usuario por el id: '+id);
+
+    const user = await User.findOne({ 
+        attributes: ['id', 'role'],
+        where: { 
+            id: id,
+            role:role
+        } 
+    });
+
+    console.log('usuario antes del update');
+    console.log((user));
+
+    user.role = role;
+
+    user.save();
+
+    console.log('usuario despues del update');
+    console.log(user);
+
+    if (user) 
+        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'})
+    else
+        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
+};
+
+
 const destroy = async (req,res) => {
 
     const id = req.params.id;
@@ -142,5 +270,9 @@ module.exports = {
     search,
     register,
     login,
-    destroy
+    destroy,
+    setDni,
+    setEmail,
+    setName,
+    setRole
 };

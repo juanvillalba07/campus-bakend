@@ -14,7 +14,13 @@ router.post("/", validateRegister, EmailIsUnique, DniIsUnique, imAdmin, admin.re
 
 router.post("/login", validateLogin, admin.login);
 
-// router.get('/logout', logOut)
+router.put('/set_name/:id_user', imAdmin, admin.setName);
+
+router.put('/set_email/:id_user', imAdmin, EmailIsUnique, admin.setEmail);
+
+router.put('/set_dni/:id_user', imAdmin, DniIsUnique, admin.setName);
+
+router.put('/set_role/:id_user', imAdmin, admin.setName);
 
 router.delete("/:id" , admin.destroy);
 

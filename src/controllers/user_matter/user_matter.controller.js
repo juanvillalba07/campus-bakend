@@ -87,7 +87,7 @@ const subscribeMatter = async (req,res) => {
 
 const cancelSubscription = async (req,res) => {
     const id_matter = req.params.id_matter;
-    const user = jwt.decode(req.headers.authorization)
+    const user = jwt.decode(req.headers.authorization);
 
     const matter = await Matter.findOne({
         attributes: ['id', 'name', 'quota', 'registered'],

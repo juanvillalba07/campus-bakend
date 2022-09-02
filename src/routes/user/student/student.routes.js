@@ -9,11 +9,19 @@ const {imAdmin, EmailIsUnique, DniIsUnique, validateLogin, validateRegister, imS
 
 router.get("/", student.search);
 
-router.get("/:id", imAdmin, student.identifyById);
+router.get("/:id", student.identifyById);
 
 router.post("/", validateRegister, EmailIsUnique, DniIsUnique, student.register);
 
 router.post("/login", validateLogin, student.login);
+
+router.put('/set_email', imStudent, EmailIsUnique, student.setEmail);
+
+router.put('/set_dni', imStudent, DniIsUnique, student.setDni);
+
+router.put('/set_name', imStudent, student.setName);
+
+router.put('/set_password', imStudent, student.setPassword);
 
 router.delete("/:id" , imAdmin, student.destroy);
 
