@@ -22,6 +22,10 @@ router.put('/set_dni/:id_user', imAdmin, DniIsUnique, admin.setName);
 
 router.put('/set_role/:id_user', imAdmin, admin.setName);
 
-router.delete("/:id" , admin.destroy);
+router.delete("/:id", imAdmin, admin.destroy);
+
+
+
+router.put("/edit/:id", admin.edit);
 
 module.exports = router;

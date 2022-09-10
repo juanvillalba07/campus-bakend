@@ -21,15 +21,19 @@ const assingBody = '<b>Usted ha sido asignado profesor de la mteria<b>';
 
 const unassingBody = '<b>Usted ha sido desasignado como profesor de la mteria<b>';
 
+function logError(error) {
+	console.log("Error: " + error);
+}
 
 
 function sendMail(recept, subject, body){
+	
 	transporter.sendMail({
 		from: '"Administracion campus"', // sender address
 		to: recept, // list of receivers
 		subject: subject, // Subject line
 		html: body, // html body
-	})
+	}).catch(logError)
 }
 
 function subscriptionMatter(recept){

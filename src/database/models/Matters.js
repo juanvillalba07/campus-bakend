@@ -11,9 +11,8 @@ module.exports = (sequelize, DataTypes) => {
 	Matter.init({
 		name: {
 			type: DataTypes.STRING(50),
-			allowNull: true,
+			allowNull: false,
 			validate: {
-				isAlpha: { msg: "El nombre solo debe contener letras" },
 				len: {
 					args: [3, 50],
 					msg: "El nombre debe contener entre 3 a 50 letras"

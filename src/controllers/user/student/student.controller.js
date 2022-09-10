@@ -14,20 +14,22 @@ const identifyById = async (req,res) => {
 
     console.log('buscando estudiante por el id: '+id);
 
-    const user = await User.findOne({ 
+    User.findOne({ 
         attributes: ['id', 'name', 'email', 'role', 'dni'],
         where: { 
             id: id,
             role:role
         } 
-    });
+    }).then(user =>{
+        console.log(user);
 
-    console.log(user);
-    
-    if (user) 
-        return res.status(200).json({'status':200, user});
-    else
-        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'});
+        if (user) 
+            return res.status(200).json({'status':200, user});
+        else
+            return res.status(404).json({'status':404, 'msg':'usuario no encontrado'});
+    }).catch(err =>{
+        return res.status(500).json({'status':500 ,'msg':err.message});
+    });  
 };
 
 
@@ -41,47 +43,62 @@ const search = async (req,res) => {
     
     console.log('obteniendo el listado de estudiantes.....');
 
-    const users = await User.findAndCountAll({
+    User.findAndCountAll({
         limit: size, 
         offset: page * size,
-        attributes: ['id', 'name', 'email', 'role', 'dni'],
+        attributes: ['id', 'name', 'email', 'role', 'dni', 'createdAt', 'updatedAt'],
         where:{role:role}
-    });
+    }).then(users =>{
+        console.log(users);
 
-    console.log(users);
-
-    return res.status(200).json({
-        'status':200, 
-        content: users.rows,
-        totalPages: Math.ceil(users.count / size),
-        page,
-    });
+        return res.status(200).json({
+            'status':200, 
+            content: users.rows,
+            totalPages: Math.ceil(users.count / size),
+            page,
+        });
+    }).catch(err =>{
+        return res.status(500).json({'status':500 ,'msg':err.message});
+    });  
 };
 
 
 const register = async (req,res) => {
 
-    const studentParam = req.body;
-    studentParam.password = await bcrypt.hash(req.body.password, 10);
+    const {name, email, password, dni} = req.body;
+
+    if (!name || !email || !password || !dni)
+        return res.status(400).json({'status':400, 'msg':'Parametros invalidos'});
+
+    const passwordHash = await bcrypt.hash(req.body.password, 10);
 
     console.log('creadno el estidenate.....');
 
-    const user = await User.create(studentParam);
+    User.create({
+        name: name,
+        email: email,
+        password: passwordHash,
+        dni: dni
+    }).then(user =>{
+        console.log(user);
 
-    console.log(user);
-
-    if (user){
-        Mail.registeUser(user.email);
-        return res.status(200).json({'status':200, user, 'msg':'Creado correctamente'});
-    } else
-        return res.status(404).json({'msg':'No se recibieron los datos'})
-};
+        if (user){
+            Mail.registeUser(user.email);
+            return res.status(200).json({'status':200, user, 'msg':'Creado correctamente'});
+        } else
+            return res.status(404).json({'msg':'No se recibieron los datos'});
+    }).catch(err =>{
+        return res.status(500).json({'status':500 ,'msg':err.message});
+    });
+}
+    
 
 
 const login = async (req, res) => {
     const {dni, password} = req.body
 
     console.log('Buscando el usuario y validando los datos ingresados......');
+    console.log(dni, password, "\n");
 
     User.findOne({
         where:{
@@ -110,7 +127,7 @@ const login = async (req, res) => {
             return res.status(401).json({msg: 'Usuario y/o contraseña incorrecta'})
         }
     }).catch(err => {
-        return res.status(500).json(err.message)
+        return res.status(500).json({'status':500 ,'msg':err.message});
     });
 }
 
@@ -121,22 +138,22 @@ const destroy = async (req,res) => {
 
     console.log('Buacando el usuario');
 
-    const user = await User.findOne({ 
+    User.findOne({ 
         where: { 
             id: id, 
             role:role
         } 
-    });
-
-    if (!user) 
-        return res.status(404).json({msg:"Usuario no encontrado"})
-    else {
+    }).then(user =>{
+        if (!user) 
+            return res.status(404).json({msg:"Usuario no encontrado"})
+        
         console.log('Eliminando usuario....');
-        user.destroy().then(user => {
-            Mail.destoyUser(user.email);
-            res.status(200).json({status:200,msg:"operation complete"})
-        })
-    }
+        user.destroy();
+        Mail.destoyUser(user.email);
+        return res.status(200).json({status:200,msg:"operation complete"});
+    }).catch(err =>{
+        return res.status(500).json({'status':500 ,'msg':err.message});
+    });
 };
 
 
@@ -145,30 +162,35 @@ const setName = async (req,res) => {
     const id = jwt.decode(req.headers.authorization).id
     const name = req.body.name;
 
+    if (!name)
+        return res.status(400).json({'status':400, 'msg':'Parametros invalidos'}); 
+
     console.log('buscando usuario por el id: '+id);
 
-    const user = await User.findOne({ 
+    User.findOne({ 
         attributes: ['id', 'name'],
         where: { 
             id: id,
             role:role
         } 
+    }).then(user =>{
+        if (!user) 
+            return res.status(404).json({'status':404, 'msg':'usuario no encontrado'});
+
+        console.log('usuario antes del update');
+        console.log(user);
+
+        user.name = name;
+
+        user.save();
+        
+        console.log('usuario despues del update');
+        console.log(user);  
+
+        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'});
+    }).catch(err =>{
+        return res.status(500).json({'status':500 ,'msg':err.message});
     });
-
-    console.log('usuario antes del update');
-    console.log((user));
-
-    user.name = name;
-
-    user.save();
-
-    console.log('usuario despues del update');
-    console.log(user);
-
-    if (user) 
-        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'})
-    else
-        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
 };
 
 
@@ -177,30 +199,35 @@ const setEmail = async (req,res) => {
     const id = jwt.decode(req.headers.authorization).id
     const email = req.body.email;
 
+    if (!email)
+        return res.status(400).json({'status':400, 'msg':'Parametros invalidos'}); 
+
     console.log('buscando usuario por el id: '+id);
 
-    const user = await User.findOne({ 
+    User.findOne({ 
         attributes: ['id', 'email'],
         where: { 
             id: id,
             role:role
         } 
+    }).then(user =>{
+        if (!user) 
+            return res.status(404).json({'status':404, 'msg':'usuario no encontrado'});
+
+        console.log('usuario antes del update');
+        console.log(user);
+
+        user.email = email;
+
+        user.save();
+        
+        console.log('usuario despues del update');
+        console.log(user);  
+
+        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'});
+    }).catch(err =>{
+        return res.status(500).json({'status':500 ,'msg':err.message});
     });
-
-    console.log('usuario antes del update');
-    console.log((user));
-
-    user.email = email;
-
-    user.save();
-
-    console.log('usuario despues del update');
-    console.log(user);
-
-    if (user) 
-        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'})
-    else
-        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
 };
 
 
@@ -209,64 +236,70 @@ const setDni = async (req,res) => {
     const id = jwt.decode(req.headers.authorization).id
     const dni = req.body.dni;
 
+    if (!dni)
+        return res.status(400).json({'status':400, 'msg':'Parametros invalidos'}); 
+
     console.log('buscando usuario por el id: '+id);
 
-    const user = await User.findOne({ 
+    User.findOne({ 
         attributes: ['id', 'dni'],
         where: { 
             id: id,
             role:role
         } 
+    }).then(user =>{
+        if (!user) 
+            return res.status(404).json({'status':404, 'msg':'usuario no encontrado'});
+
+        console.log('usuario antes del update');
+        console.log(user);
+
+        user.dni = dni;
+
+        user.save();
+        
+        console.log('usuario despues del update');
+        console.log(user);  
+
+        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'});
+    }).catch(err =>{
+        return res.status(500).json({'status':500 ,'msg':err.message});
     });
-
-    console.log('usuario antes del update');
-    console.log((user));
-
-    user.dni = dni;
-
-    user.save();
-
-    console.log('usuario despues del update');
-    console.log(user);
-
-    if (user) 
-        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'})
-    else
-        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
 };
 
 
 const setPassword = async (req,res) => {
 
     const id = jwt.decode(req.headers.authorization).id
-    const password = await bcrypt.hash(req.body.password, 10);;
+    const password = await bcrypt.hash(req.body.password, 10);
 
     console.log('buscando usuario por el id: '+id);
 
-    const user = await User.findOne({ 
+    User.findOne({ 
         attributes: ['id', 'password'],
         where: { 
             id: id,
             role:role
         } 
+    }).then(user =>{
+        if (!user) 
+            return res.status(404).json({'status':404, 'msg':'usuario no encontrado'});
+
+        console.log('usuario antes del update');
+        console.log(user);
+
+        user.password = password;
+
+        user.save();
+        
+        console.log('usuario despues del update');
+        console.log(user);  
+
+        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'});
+    }).catch(err =>{
+        return res.status(500).json({'status':500 ,'msg':err.message});
     });
-
-    console.log('usuario antes del update');
-    console.log((user));
-
-    user.password = password;
-
-    user.save();
-
-    console.log('usuario despues del update');
-    console.log(user);
-
-    if (user) 
-        return res.status(200).json({'status':200, 'msg':'usuario actualizado correctamente'})
-    else
-        return res.status(404).json({'status':404, 'msg':'usuario no encontrado'})
 };
-
 
 module.exports = {
     identifyById,

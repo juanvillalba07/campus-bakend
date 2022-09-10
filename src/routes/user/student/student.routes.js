@@ -13,7 +13,7 @@ router.get("/:id", student.identifyById);
 
 router.post("/", validateRegister, EmailIsUnique, DniIsUnique, student.register);
 
-router.post("/login", validateLogin, student.login);
+router.post("/login", student.login);
 
 router.put('/set_email', imStudent, EmailIsUnique, student.setEmail);
 

@@ -13,6 +13,8 @@ router.get("/:id", matter.identifyById);
 
 router.post("/", imAdmin, NameIsUnique, matter.register);
 
-router.delete("/:id" , imAdmin, matter.destroy);
+router.delete("/:id", imAdmin, matter.destroy);
+
+router.put("/:id", imAdmin, matter.edit);
 
 module.exports = router;

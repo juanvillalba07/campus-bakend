@@ -29,7 +29,7 @@ const validateRegister = [
         .withMessage('No contiene un formato de email valido'),
     check('dni')
         .exists()
-        .isLength({ min: 7, max: 8 })
+        .isLength({ min: 7, max: 9 })
         .withMessage('DNI invalido'),
     check('password')
         .exists()
@@ -53,7 +53,7 @@ const DniIsUnique = async (req, res, next) => {
             next()
         }
     }).catch(err => {
-        return res.status(500).json(err.message)
+        return res.status(500).json(err.message + 'CarlosCarlitos')
     })
 };
 
