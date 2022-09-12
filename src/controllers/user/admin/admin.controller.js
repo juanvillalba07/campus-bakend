@@ -58,7 +58,7 @@ const search = async (req,res) => {
 
 const register = async (req,res) => {
 
-    const {name, email, password, dni} = req.body;
+    const {name, email, password, dni, role} = req.body;
 
     if (!name || !email || !password || !dni)
         return res.status(400).json({'status':400, 'msg':'Parametros invalidos'});

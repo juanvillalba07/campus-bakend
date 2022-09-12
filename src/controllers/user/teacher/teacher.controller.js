@@ -33,36 +33,6 @@ const identifyById = async (req,res) => {
 };
 
 
-const search = async (req,res) => {
-
-    const pageAsNumber = Number.parseInt(req.query.page);
-    const page = 0, size = 10;
-    
-    if (!Number.isNaN(pageAsNumber)) 
-        page = pageAsNumber;
-
-    console.log('obteniendo el listado de profesores');
-    
-    User.findAndCountAll({
-        limit: size, 
-        offset: page * size,
-        attributes: ['id', 'name', 'email', 'role', 'dni', 'createdAt', 'updatedAt'],
-        where:{role:role}
-    }).then(users =>{
-        console.log(users);
-
-        return res.status(200).json({
-            'status':200, 
-            content: users.rows,
-            totalPages: Math.ceil(users.count / size),
-            page,
-        });
-    }).catch(err =>{
-        return res.status(500).json({'status':500 ,'msg':err.message});
-    });
-};
-
-
 const register = async (req,res) => {
 
     const {name, email, password, dni} = req.body;
@@ -78,7 +48,8 @@ const register = async (req,res) => {
         name: name,
         email: email,
         password: passwordHash,
-        dni: dni
+        dni: dni,
+        role:role
     }).then(user =>{
         console.log(user);
 
@@ -296,7 +267,6 @@ const setPassword = async (req,res) => {
 
 module.exports = {
     identifyById,
-    search,
     register,
     login,
     destroy,

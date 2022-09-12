@@ -6,8 +6,6 @@ const {imAdmin, EmailIsUnique, DniIsUnique, validateLogin, validateRegister, imT
 
 //APIs
 
-router.get("/", teacher.search);
-
 router.get("/:id", teacher.identifyById);
 
 router.post("/", validateRegister, EmailIsUnique, DniIsUnique, imAdmin, teacher.register);

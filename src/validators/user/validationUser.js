@@ -2,7 +2,6 @@ const { User } = require('../../database/models/index');
 const { check } = require('express-validator');
 const { validateResult } = require('../../helpers/validateHelper');
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcryptjs');
 
 const validateLogin = [
 
@@ -53,7 +52,7 @@ const DniIsUnique = async (req, res, next) => {
             next()
         }
     }).catch(err => {
-        return res.status(500).json(err.message + 'CarlosCarlitos')
+        return res.status(500).json(err.message);
     })
 };
 

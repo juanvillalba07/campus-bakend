@@ -7,7 +7,7 @@ const { MatterExist, AllReadySubscribe, ImSubscribe, VacancyAvailable} = require
 
 //API
 
-router.get("/inscript/:id_matter", user_matter.getStudentInscript);
+router.get("/inscript/:id_matter", imTeacher, user_matter.getStudentInscript);
 
 router.get("/subscribe", imStudent, user_matter.getMatterInscript);
 

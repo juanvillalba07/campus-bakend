@@ -126,7 +126,7 @@ const getStudentInscript = async (req, res) => {
     const user_matter = await User_matter.findAndCountAll({
         limit: size,
         offset: page * size,
-        attributes: ['user_id', 'matter_id'],
+        attributes: ['user_id', 'matter_id','note_1','note_2','note_3'],
         where: { matter_id: id_matter }
     });
 
@@ -137,7 +137,6 @@ const getStudentInscript = async (req, res) => {
     const studentList = await Promise.all(
         user_matter.rows.map(async (user) => {
             const id = user.dataValues.user_id
-            console.log(id);
             const result = await User.findOne({
                 attributes: ['id', 'name', 'dni'],
                 where: { 
@@ -145,7 +144,9 @@ const getStudentInscript = async (req, res) => {
                     role:'student'
                 }
             });
-            console.log(result);
+            result.dataValues.note_1 = user.dataValues.note_1;
+            result.dataValues.note_2 = user.dataValues.note_2;
+            result.dataValues.note_3 = user.dataValues.note_3;
             return result;
         })
     );
